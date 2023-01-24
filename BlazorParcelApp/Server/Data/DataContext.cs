@@ -32,6 +32,8 @@ namespace BlazorParcelApp.Server.Data {
                 .WithMany(x => x.ParcelsSrc)
                 .HasForeignKey(x => x.SrcId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+
+
         }
     }
 }

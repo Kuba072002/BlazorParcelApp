@@ -12,7 +12,7 @@ namespace BlazorParcelApp.Shared {
         public string Email { get; set; } = string.Empty;
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
-        public string Role { get; set; } = "Customer";
+        public string Role { get; set; } = "User";
         public List<Parcel> SentParcels { get; set; } = new List<Parcel>();
         public List<Parcel> ReceivedParcels { get; set; } = new List<Parcel>();
 

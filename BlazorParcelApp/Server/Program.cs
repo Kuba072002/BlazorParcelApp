@@ -1,22 +1,42 @@
 global using BlazorParcelApp.Shared;
 using BlazorParcelApp.Server.Data;
 using BlazorParcelApp.Server.Services;
+using BlazorParcelApp.Server.Services.LokcerService;
+using BlazorParcelApp.Server.Services.ParcelService;
+using BlazorParcelApp.Server.Services.UserService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddDbContext<DataContext>(
-    o => o.UseNpgsql(builder.Configuration.GetConnectionString("postgresTestLocal"))
+    o => o.UseNpgsql(builder.Configuration.GetConnectionString("postgresTest"))
     );
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options => {
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme {
+        Description = "Standard Authorization header using bearer scheme(\"bearer {token}\")",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
+
+builder.Services.AddScoped<ILockerService, LockerService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IParcelService, ParcelService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options => {
@@ -29,8 +49,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
     });
-
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
+app.UseSwaggerUI();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
@@ -42,6 +63,7 @@ else {
     app.UseHsts();
 }
 
+app.UseSwagger();
 app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
@@ -49,6 +71,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();

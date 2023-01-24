@@ -1,0 +1,58 @@
+﻿@page "/parcels/add"
+@inject HttpClient Http
+@inject NavigationManager NavManager
+@attribute [Authorize]
+<h3>Parcel_add</h3>
+
+<div class="container-fluid">
+    <div class="row px-3">
+        <div class="col-md-9 p-3">
+            <EditForm Model="parcelDto" OnSubmit="OnSubmit">
+            <div class="row">
+                <div class="col">
+                    <div>Name:</div>
+                    <InputText @bind-Value="parcelDto.Name" class="form-control"></InputText>
+                </div>
+                <div class="col">
+                    <div>From:</div>
+                    <InputText @bind-Value="parcelDto.SrcLocker" class="form-control"></InputText>
+                </div>
+                <div class="col">
+                    <div>To:</div>
+                    <InputText @bind-Value="parcelDto.DestLocker" class="form-control"></InputText>
+                </div>
+                <div class="col">
+                    <div>Receiver:</div>
+                    <InputText @bind-Value="parcelDto.Receiver" class="form-control"></InputText>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="oi oi-cloud-upload"></i>
+                    </button>
+                    <div class="text-danger">
+                    <span>@errorMessage</span>
+                </div>
+                </div>
+            </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    ParcelDto parcelDto = new ParcelDto();
+    private string errorMessage = string.Empty;
+
+    private async Task OnSubmit() {
+        var result = await Http.PostAsJsonAsync($"/api/Parcel/", parcelDto);
+
+        if (!result.IsSuccessStatusCode) {
+            errorMessage = await result.Content.ReadAsStringAsync();
+            return;
+        }
+
+        NavManager.NavigateTo($"/parcels");
+
+
+    }
+}
