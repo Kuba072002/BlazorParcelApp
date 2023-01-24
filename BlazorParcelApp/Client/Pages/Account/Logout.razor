@@ -1,0 +1,12 @@
+﻿@page "/account/logout"
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavManager
+
+@code {
+    protected override async void OnInitialized() {
+        await LocalStorage.RemoveItemAsync("authToken");
+        await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        NavManager.NavigateTo("/");
+    }
+}

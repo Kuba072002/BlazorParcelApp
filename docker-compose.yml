@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  blazorparcelapp.server:
+    image: ${DOCKER_REGISTRY-}blazorparcelappserver
+    build:
+      context: .
+      dockerfile: BlazorParcelApp/Server/Dockerfile
+  postgresql_database:
+    image: postgres:latest
+    container_name: blazorParcelApp_DB
+    environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=parcelDb
+    ports:
+        - "5432:5432"
