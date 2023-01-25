@@ -12,13 +12,24 @@ namespace BlazorParcelApp.Server.Controllers {
             _parcelService = parcelService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<ParcelDto>>> GetParcels() {
+        [HttpGet("get2")]
+        public async Task<ActionResult<List<ParcelDto>>> GetParcels2() {
             var response = await _parcelService.GetParcels();
             if (!response.Success) {
                 return BadRequest(response);
             }
-            return Ok(response.Data.ToArray());
+            var result = response.Data.ToArray();
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<ServiceResponse<List<ParcelDto>>>> GetParcels() {
+            var response = await _parcelService.GetParcels();
+            if (!response.Success) {
+                return BadRequest(response);
+            }
+            var result = response.Data.ToArray();
+            return Ok(response);
         }
         [HttpGet("{Id}")]
         public async Task<ActionResult<ParcelDto>> GetParcel(int Id) {

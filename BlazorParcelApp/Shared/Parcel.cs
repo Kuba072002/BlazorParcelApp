@@ -12,7 +12,7 @@ namespace BlazorParcelApp.Shared {
         public string Name { get; set; } = string.Empty;
         public string State { get; set; } = string.Empty;
         public int? SenderId { get; set; }
-        public User? Sender { get; set; }
+        public User Sender { get; set; }
         
         public int? ReceiverId { get; set; }
         public User Receiver { get; set; }

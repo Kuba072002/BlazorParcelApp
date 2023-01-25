@@ -7,16 +7,18 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
     public class ParcelService : IParcelService {
         private readonly DataContext _context;
         private readonly IUserService _userService;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public ParcelService(DataContext context, IUserService userService) {
+        public ParcelService(DataContext context, IUserService userService, IHttpContextAccessor contextAccessor) {
             _context = context;
             _userService = userService;
+            _contextAccessor = contextAccessor;
         }
 
         public async Task<ServiceResponse<ParcelDto>> AddParcel(ParcelDto parcelDto) {
             var response = new ServiceResponse<ParcelDto>();
-            var user = _context.Users.Where(u => u.Username == _userService.GetUserName()).FirstOrDefault();
-            //var sender = await _context.Users.FindAsync(2);
+            var user = _context.Users.Where(u => u.Username.Equals(_userService.GetUserName())).FirstOrDefault();
+            //var sender = await _context.Users.FindAsync();
             var receiver = await _context.Users.Where(u => u.Username == parcelDto.Receiver).FirstOrDefaultAsync();
             var lockerSrc = await _context.Lockers.Where(u => u.Name == parcelDto.SrcLocker).FirstOrDefaultAsync();
             var lockerDest = await _context.Lockers.Where(u => u.Name == parcelDto.DestLocker).FirstOrDefaultAsync();
@@ -72,9 +74,18 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
             List<ParcelDto> parcelsDtoList = new();
             //var userId = _userService.GetUserId();
             var userName = _userService.GetUserName();
+            if (_contextAccessor.HttpContext != null) {
+                userName = _contextAccessor.HttpContext.User?.Identity?.Name;//.FindFirstValue(ClaimTypes.Name);
+            }
+            //string name = principal.Identity.Name;
             var userRole = _userService.GetUserRole();
-            var parcels = await _context.Parcels.Include(x => x.SrcLocker).Include(x => x.DestLocker)
-                    .Include(x => x.Receiver).Where(u => u.Sender.Username == userName).ToListAsync();
+            var parcels = await _context.Parcels
+                .Include(x => x.SrcLocker)
+                .Include(x => x.DestLocker)
+                .Include(x => x.Receiver)
+                .Include(x => x.Sender)
+                //.Where(u => u.Sender.Username.Equals(userName) || u.Receiver.Username.Equals(userName))
+                .ToListAsync();
             foreach(var p in parcels) {
                 ParcelDto pdto = new ParcelDto {
                     Id = p.Id,

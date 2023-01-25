@@ -17,5 +17,11 @@ namespace BlazorParcelApp.Server.Controllers {
         public ActionResult<string> GetMe() {
             return Ok(_userService.GetUserName());
         }
+
+        [HttpGet("GetUsernames"), Authorize]
+        public ActionResult<string> GetUsernames() {
+            var result = _userService.GetUsernames();
+            return Ok(result);
+        }
     }
 }

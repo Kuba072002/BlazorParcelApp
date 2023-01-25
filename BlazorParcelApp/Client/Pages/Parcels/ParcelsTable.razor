@@ -1,0 +1,47 @@
+﻿@page "/parcels"
+@using BlazorParcelApp.Client.Services;
+@inject HttpClient Http
+@inject IParcelService ParcelService
+@attribute [Authorize]
+<h3>Parcels</h3>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Sorting</strong>
+</RadzenText>
+
+    <RadzenDataGrid PageSize="5" AllowPaging="true" AllowSorting="true" Data="@parcels" TItem="ParcelDto" ColumnWidth="400px" >
+        <Columns>
+            <RadzenDataGridColumn TItem="ParcelDto" Property="Name" Title="Name" Width="150px" />
+            <RadzenDataGridColumn TItem="ParcelDto" Property="State" Title="State" Width="150px"/>
+            <RadzenDataGridColumn TItem="ParcelDto" Property="Sender" Title="Sender" FormatString="{0:d}" Width="150px" />
+            <RadzenDataGridColumn TItem="ParcelDto" Property="Receiver" Title="Receiver" Width="150px" />
+            <RadzenDataGridColumn TItem="ParcelDto" Property="DestLocker" Title="DestLocker" />
+            <RadzenDataGridColumn TItem="ParcelDto" Property="SrcLocker" Title="SrcLocker" />
+        </Columns>
+    </RadzenDataGrid>
+    @foreach (ParcelDto p in parcels) {
+            <p>p.Name</p>
+    }
+    @username2
+
+    
+@code {
+    IEnumerable<ParcelDto> parcels = null;
+    string username2 = string.Empty;
+
+    protected override async Task OnInitializedAsync() {
+        // var username = await Http.GetStringAsync("api/User/GetMyName");
+        //var username3 = await HttpClient.("api/User/GetMyName");
+        //username2 = username;
+        //parcels = await Http.GetFromJsonAsync<List<ParcelDto>>("api/Parcel/get2");
+        //ToReceive = result;
+        //Se = result;
+        //Sended = result.Where(p => p.Sender.Equals(username)).ToList<ParcelDto>();
+        //ToReceive = result.Where(p => p.Receiver.Equals(username)).ToList<ParcelDto>();
+        //parcels = await ParcelService.GetParcels();
+        parcels = await ParcelService.GetItems();
+    }
+
+
+
+}
