@@ -3,35 +3,24 @@
 @inject NavigationManager NavManager
 @attribute [Authorize(Roles = "Admin")]
 
-<h3>AddLocker</h3>
-
-<div class="container-fluid">
-    <div class="row px-3">
-        <div class="col-md-9 p-3">
-            <EditForm Model="lockerdto" OnSubmit="OnSubmit">
-            <div class="row">
-                <div class="col">
-                    <div>Name:</div>
-                    <InputText @bind-Value="lockerdto.Name" class="form-control"></InputText>
-                </div>
-                <div class="col">
-                    <div>City:</div>
-                    <InputText @bind-Value="lockerdto.City" class="form-control"></InputText>
-                </div>
-                <br/>
-                <div class="col">
-                    <button type="submit" class="btn btn-primary">
-                        <!----<i class="oi oi-cloud-upload"></i>---->
-                    </button>
-                    <div class="text-danger">
-                    <span>@errorMessage</span>
-                </div>
-                </div>
-            </div>
-            </EditForm>
-        </div>
+<EditForm Model="lockerdto" OnSubmit="OnSubmit" class="d-flex flex-column align-items-center">
+<div class="border p-4 col-6">
+    <h3 class="text-center">AddLocker</h3>
+    <div class="mb-2">
+        <label for="city">City:</label>
+        <InputText @bind-Value="lockerdto.City" class="form-control"></InputText>
     </div>
-</div>
+    <div class="mb-2">
+        <label for="name">Address:</label>
+        <InputText @bind-Value="lockerdto.Address" class="form-control"></InputText>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3 w-100">Add</button>
+    <div class="text-danger">
+        <span>@errorMessage</span>
+    </div>
+</div>       
+</EditForm>
+
 @code {
     LockerDto lockerdto = new LockerDto();
     private string errorMessage = string.Empty;
@@ -44,7 +33,7 @@
             return;
         }
 
-        NavManager.NavigateTo($"/notes");
+        NavManager.NavigateTo($"/lockers");
 
 
     }

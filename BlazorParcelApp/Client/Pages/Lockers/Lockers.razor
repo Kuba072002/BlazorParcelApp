@@ -1,0 +1,25 @@
+﻿@page "/lockers"
+@inject HttpClient Http
+
+<RadzenDataGrid PageSize="5" AllowColumnResize="true" 
+    AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 
+    AllowPaging="true" AllowSorting="true" 
+    AllowFiltering="true" FilterMode="FilterMode.Advanced"
+    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    LogicalFilterOperator="LogicalFilterOperator.Or" 
+    FilterPopupRenderMode="PopupRenderMode.OnDemand"
+    Data="@lockers" TItem="LockerDto" ColumnWidth="400px" >
+    <Columns>
+        <RadzenDataGridColumn TItem="LockerDto" Property="Name" Title="Name" />
+        <RadzenDataGridColumn TItem="LockerDto" Property="City" Title="State" />
+        <RadzenDataGridColumn TItem="LockerDto" Property="Address" Title="Sender" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    List<LockerDto> lockers = new();
+    protected override async Task OnInitializedAsync()
+    {
+        lockers = await Http.GetFromJsonAsync<List<LockerDto>>($"/api/Locker");
+    }
+}
