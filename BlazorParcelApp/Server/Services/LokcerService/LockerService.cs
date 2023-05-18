@@ -1,6 +1,8 @@
 ﻿using BlazorParcelApp.Server.Data;
 using BlazorParcelApp.Shared;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System;
 
 namespace BlazorParcelApp.Server.Services.LokcerService {
     public class LockerService : ILockerService {
@@ -10,9 +12,11 @@ namespace BlazorParcelApp.Server.Services.LokcerService {
         }
         public async Task<ServiceResponse<LockerDto>> AddLocker(LockerDto lockerDto) {
             var responce = new ServiceResponse<LockerDto>();
-            var locker = new Locker {
-                Name = lockerDto.Name,
-                City = lockerDto.City
+            var locker = new Locker
+            {
+                Address = lockerDto.Address,
+                City = lockerDto.City,
+                Name = await CreateName(lockerDto.City)
             };
             _context.Lockers.Add(locker);
             await _context.SaveChangesAsync();
@@ -30,6 +34,7 @@ namespace BlazorParcelApp.Server.Services.LokcerService {
             if (locker != null) {
                 var lockerDto = new LockerDto {
                     Name = locker.Name,
+                    Address = locker.Address,
                     City = locker.City,
                 };
                 responce.Success = true;
@@ -52,6 +57,7 @@ namespace BlazorParcelApp.Server.Services.LokcerService {
                 LockerDto sd = new LockerDto {
                     Id = l.Id,
                     Name = l.Name,
+                    Address = l.Address,
                     City = l.City,
                 };
                 responceList.Add(sd);
@@ -61,6 +67,14 @@ namespace BlazorParcelApp.Server.Services.LokcerService {
             response.Data = responceList;
 
             return response;
+        }
+
+        private async Task<string> CreateName(string CityName)
+        {
+            var numberLockerInCity = await _context.Lockers.CountAsync(l => l.City.Equals(CityName));
+            if(numberLockerInCity < 10)
+                return string.Concat(CityName.AsSpan(0, Math.Min(CityName.Length, 3)), "0", (numberLockerInCity+1).ToString());
+            return string.Concat(CityName.AsSpan(0, Math.Min(CityName.Length, 3)), (numberLockerInCity + 1).ToString());
         }
     }
 }
