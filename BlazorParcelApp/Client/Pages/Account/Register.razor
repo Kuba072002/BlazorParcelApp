@@ -4,9 +4,11 @@
 
 <PageTitle>Register</PageTitle>
 
-<h3>Register</h3>
 
-<EditForm Model="user" OnValidSubmit="HandleRegistration">
+
+<EditForm Model="user" OnValidSubmit="HandleRegistration" class="d-flex flex-column align-items-center">
+<div class="border p-4 col-6">
+    <h3 class="text-center">Register</h3>
     <DataAnnotationsValidator />
     <div class="mb-3">
         <label for="usernane">Username</label>
@@ -28,10 +30,15 @@
         <InputText id="confirmPassword" @bind-Value="user.ConfirmPassword" class="form-control" type="password" />
         <ValidationMessage For="@(() => user.ConfirmPassword)" />
     </div>
-    <button type="submit" class="btn btn-primary">Register</button>
-    <div class="@messageCssClass">
+    <button type="submit" class="btn btn-primary w-100">Register</button>
+    <div class="@messageCssClass mt-2 text-center">
         <span>@message</span>
     </div>
+
+    <div class="alert alert-info mt-3">
+        If you already have an account, please <a href="account/login">Log in</a>
+    </div>
+</div>
 </EditForm>
 
 @code {
