@@ -8,7 +8,7 @@
     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
     LogicalFilterOperator="LogicalFilterOperator.Or" 
     FilterPopupRenderMode="PopupRenderMode.OnDemand"
-    Data="@lockers" TItem="LockerDto" ColumnWidth="400px" >
+    Data="@lockers" TItem="LockerDto" >
     <Columns>
         <RadzenDataGridColumn TItem="LockerDto" Property="Name" Title="Name" />
         <RadzenDataGridColumn TItem="LockerDto" Property="City" Title="State" />
@@ -20,6 +20,6 @@
     List<LockerDto> lockers = new();
     protected override async Task OnInitializedAsync()
     {
-        lockers = await Http.GetFromJsonAsync<List<LockerDto>>($"/api/Locker");
+        lockers = await Http.GetFromJsonAsync<List<LockerDto>>($"/api/Locker");       
     }
 }
