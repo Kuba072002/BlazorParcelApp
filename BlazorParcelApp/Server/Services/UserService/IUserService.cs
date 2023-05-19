@@ -3,6 +3,6 @@
         public string GetUserName();
         public string GetUserId();
         public string GetUserRole();
-        public List<string> GetUsernames();
+        public Task<List<string>> GetUsernames();
     }
 }

@@ -36,6 +36,6 @@ namespace BlazorParcelApp.Server.Services.UserService {
             return result;
         }
 
-        public List<string> GetUsernames() => _context.Users.Select(x => x.Username).ToList();
+        public async Task<List<string>> GetUsernames() => await _context.Users.Select(x => x.Username).ToListAsync();
     }
 }

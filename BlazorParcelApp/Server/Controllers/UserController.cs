@@ -1,6 +1,5 @@
 ﻿using BlazorParcelApp.Server.Services.UserService;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorParcelApp.Server.Controllers {
@@ -8,7 +7,7 @@ namespace BlazorParcelApp.Server.Controllers {
     [ApiController]
     public class UserController : ControllerBase {
         private readonly IUserService _userService;
-
+        
         public UserController(IUserService userService) {
             _userService = userService;
         }
@@ -19,9 +18,9 @@ namespace BlazorParcelApp.Server.Controllers {
         }
 
         [HttpGet("GetUsernames"), Authorize]
-        public ActionResult<string> GetUsernames() {
-            var result = _userService.GetUsernames();
-            return Ok(result);
+        public async Task<ActionResult<string>> GetUsernamesAsync() {
+            var result = await _userService.GetUsernames();
+            return Ok(result.ToArray());
         }
     }
 }
