@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: BlazorParcelApp/Server/Dockerfile
+    ports:
+        - "7210:443"
   postgresql_database:
     image: postgres:latest
     container_name: blazorParcelApp_DB
