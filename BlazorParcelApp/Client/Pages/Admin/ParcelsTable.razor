@@ -1,9 +1,9 @@
-﻿@page "/parcels"
+﻿@page "/admin/parcels"
 @using BlazorParcelApp.Client.Services;
 @inject HttpClient Http
 @inject IParcelService ParcelService
 @inject IJSRuntime JSRuntime
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin")]
 
 <h3>Parcels</h3>
 <RadzenDataGrid PageSize="5" AllowColumnResize="true"
@@ -33,7 +33,6 @@
 
 @code {
     List<ParcelDto> parcels = new();
-    string username2 = string.Empty;
 
     protected override async Task OnInitializedAsync() {
         parcels = await ParcelService.GetParcels();

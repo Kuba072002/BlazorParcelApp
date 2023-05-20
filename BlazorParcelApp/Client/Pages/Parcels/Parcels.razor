@@ -1,0 +1,45 @@
+﻿@page "/parcels"
+@using BlazorParcelApp.Client.Services;
+@inject HttpClient Http
+@inject IParcelService ParcelService
+@inject IAuthService AuthService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+<div class="d-flex flex-row justify-content-between m-3">
+<h3>Parcels</h3>
+<RadzenButton Click="@GoToAddParcelPage" Text="Add parcel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" />
+</div>
+<RadzenDataGrid PageSize="5" AllowColumnResize="true"
+    AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 
+    AllowPaging="true" AllowSorting="true" 
+    AllowFiltering="true" FilterMode="FilterMode.Advanced"
+    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    LogicalFilterOperator="LogicalFilterOperator.Or" 
+    FilterPopupRenderMode="PopupRenderMode.OnDemand"
+    Data="@parcels" TItem="ParcelDto" >
+    <Columns>
+        <RadzenDataGridColumn TItem="ParcelDto" Property="Name" Title="Name" />
+        <RadzenDataGridColumn TItem="ParcelDto" Property="CurrentState" Title="State" />
+        <RadzenDataGridColumn TItem="ParcelDto" Property="Sender" Title="Sender" />
+        <RadzenDataGridColumn TItem="ParcelDto" Property="SrcLocker" Title="SrcLocker" />
+        <RadzenDataGridColumn TItem="ParcelDto" Property="Receiver" Title="Receiver" />
+        <RadzenDataGridColumn TItem="ParcelDto" Property="DestLocker" Title="DestLocker" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    List<ParcelDto> parcels = new();
+    string username = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        username = await AuthService.GetUsername();
+        parcels = await ParcelService.GetParcelsByUser(username);
+    }
+
+    void GoToAddParcelPage()
+    {
+        NavigationManager.NavigateTo("/parcel-add");
+    }
+}
