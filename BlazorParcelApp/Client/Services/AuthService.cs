@@ -9,6 +9,11 @@ namespace BlazorParcelApp.Client.Services {
             _http = http;
             _authStateProvider = authStateProvider;
         }
+
+        public async Task<string> GetUsername()
+        {
+            return (await _authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
+        }
         public async Task<bool> IsUserAuthenticated() {
             return (await _authStateProvider.GetAuthenticationStateAsync()).User.Identity.IsAuthenticated;
         }
