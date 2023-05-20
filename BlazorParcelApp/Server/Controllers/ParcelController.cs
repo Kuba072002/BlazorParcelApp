@@ -38,9 +38,9 @@ namespace BlazorParcelApp.Server.Controllers {
             }
             return Ok(response.Message);
         }
-        [HttpPut]
-        public async Task<ActionResult<ParcelDto>> UpdateParcel(ParcelDto parcelDto) {
-            var response = await _parcelService.UpdateParcel(parcelDto);
+        [HttpPut("UpdateParcelState/{parcelId}")]
+        public async Task<ActionResult<ParcelDto>> UpdateParcelState(int parcelId) {
+            var response = await _parcelService.UpdateParcelState(parcelId);
             if (!response.Success) {
                 return BadRequest(response);
             }

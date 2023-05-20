@@ -81,8 +81,6 @@ else
             return;
         }
         parcelDto.Sender = myUsername;
-        
-        parcelDto.State = "posted";
 
         var result = await Http.PostAsJsonAsync($"/api/Parcel/", parcelDto);
 

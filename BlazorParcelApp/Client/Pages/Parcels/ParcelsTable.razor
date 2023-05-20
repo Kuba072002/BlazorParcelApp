@@ -2,6 +2,7 @@
 @using BlazorParcelApp.Client.Services;
 @inject HttpClient Http
 @inject IParcelService ParcelService
+@inject IJSRuntime JSRuntime
 @attribute [Authorize]
 
 <h3>Parcels</h3>
@@ -15,11 +16,18 @@
     Data="@parcels" TItem="ParcelDto" >
     <Columns>
         <RadzenDataGridColumn TItem="ParcelDto" Property="Name" Title="Name" />
-        <RadzenDataGridColumn TItem="ParcelDto" Property="State" Title="State" />
+        <RadzenDataGridColumn TItem="ParcelDto" Property="CurrentState" Title="State" />
         <RadzenDataGridColumn TItem="ParcelDto" Property="Sender" Title="Sender" />
         <RadzenDataGridColumn TItem="ParcelDto" Property="SrcLocker" Title="SrcLocker" />
         <RadzenDataGridColumn TItem="ParcelDto" Property="Receiver" Title="Receiver" />
         <RadzenDataGridColumn TItem="ParcelDto" Property="DestLocker" Title="DestLocker" />
+        
+        <RadzenDataGridColumn TItem="ParcelDto" Title="Actions" TextAlign="TextAlign.Center"
+            Filterable="false" Sortable="false" Width="138px">
+            <Template Context="parcel">
+                <RadzenButton Click="@(() => ChangeState(parcel))" Text="Change status" Size="ButtonSize.ExtraSmall" ButtonStyle="ButtonStyle.Secondary" />
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
@@ -31,4 +39,13 @@
         parcels = await ParcelService.GetParcels();
     }
 
+    private async Task ChangeState(ParcelDto parcel)
+    {
+        if (await JSRuntime.InvokeAsync<bool>
+                ("confirm", "Are you sure you want to change status of this parcel?"))
+        {
+            await Http.PutAsJsonAsync($"/api/Parcel/UpdateParcelState/{parcel.Id}",parcel.Id);
+            parcels = await ParcelService.GetParcels();
+        }
+    }
 }

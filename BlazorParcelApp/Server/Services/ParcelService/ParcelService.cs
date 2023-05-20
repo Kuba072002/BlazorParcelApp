@@ -2,6 +2,7 @@
 using BlazorParcelApp.Server.Services.UserService;
 using BlazorParcelApp.Shared;
 using Microsoft.EntityFrameworkCore;
+using static BlazorParcelApp.Shared.Parcel;
 
 namespace BlazorParcelApp.Server.Services.ParcelService {
     public class ParcelService : IParcelService {
@@ -25,7 +26,7 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
 
             var newShipment = new Parcel {
                 Name = Guid.NewGuid().ToString("N").Substring(0, 8),
-                State = parcelDto.State,
+                CurrentState = State.Posted,
                 Sender = user,
                 Receiver = receiver,
                 SrcLocker = lockerSrc,
@@ -58,7 +59,7 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
             ParcelDto sd = new ParcelDto {
                 Id = parcel.Id,
                 Name = parcel.Name,
-                State = parcel.State,
+                CurrentState = parcel.CurrentState,
                 Sender = parcel.Sender.Username,
                 Receiver = parcel.Receiver.Username,
                 SrcLocker = parcel.SrcLocker.Name,
@@ -90,7 +91,7 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
                 ParcelDto pdto = new ParcelDto {
                     Id = p.Id,
                     Name = p.Name,
-                    State = p.State,
+                    CurrentState = p.CurrentState,
                     Sender = p.Sender.Username,
                     Receiver = p.Receiver.Username,
                     DestLocker = p.DestLocker.Name,
@@ -105,23 +106,20 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
             return responce;
         }
 
-        public async Task<ServiceResponse<ParcelDto>> UpdateParcel(ParcelDto parcelDto) {
-            var response = new ServiceResponse<ParcelDto>();
-
-            var parcel = await _context.Parcels.FirstOrDefaultAsync(i => i.Id == parcelDto.Id);
-            if (parcel == null) {
-                response.Success = false;
-                response.Message = "Shipment not found";
-                return response;
-
+        public async Task<ServiceResponse<ParcelDto>> UpdateParcelState(int parcelId) {
+            var parcel = await _context.Parcels.FirstOrDefaultAsync(i => i.Id == parcelId);
+            if (parcel == null) 
+                return new ServiceResponse<ParcelDto> 
+                    { Success = false, Message = "Shipment not found" };
+            int currentIndex = (int)parcel.CurrentState;
+            if (currentIndex + 1 < Enum.GetValues(typeof(State)).Length)
+            {
+                parcel.CurrentState = (State)currentIndex + 1;
+                _context.Parcels.Update(parcel);
+                await _context.SaveChangesAsync();
             }
-
-            parcel.State = parcelDto.State;
-            _context.Parcels.Update(parcel);
-            await _context.SaveChangesAsync();
-
-            response.Data = parcelDto;
-            return response;
+            return new ServiceResponse<ParcelDto>
+                    { Success = true, Message = "Parcel already received" };
         }
     }
 }
