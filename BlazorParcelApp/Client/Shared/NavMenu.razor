@@ -26,7 +26,7 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="parcels/add">
+            <NavLink class="nav-link" href="/parcel-add">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Add parcel
             </NavLink>
         </div>
@@ -41,9 +41,16 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/lockers">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Lockers
-            </NavLink>
+            <AuthorizeView Roles="User">
+                <NavLink class="nav-link" href="/lockers">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Lockers
+                </NavLink>
+            </AuthorizeView>
+            <AuthorizeView Roles="Admin">
+                <NavLink class="nav-link" href="/admin/lockers">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Lockers
+                </NavLink>
+            </AuthorizeView>
         </div>
     </nav>
 </div>

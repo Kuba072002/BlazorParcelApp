@@ -33,5 +33,27 @@ namespace BlazorParcelApp.Server.Controllers {
             }
             return Ok(response.Data);
         }
+
+        [HttpPut,Authorize(Roles = "Admin")]
+        public async Task<ActionResult<string>> UpdateLocker(LockerDto lockerDto)
+        {
+            var response = await _lockerService.UpdateLocker(lockerDto);
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+            return Ok(response.Message);
+        }
+
+        [HttpDelete("{lockerId}"),Authorize(Roles = "Admin")]
+        public async Task<ActionResult<string>> DeleteLocker(int lockerId)
+        {
+            var response = await _lockerService.DeleteLocker(lockerId);
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+            return Ok(response.Message);
+        }
     }
 }

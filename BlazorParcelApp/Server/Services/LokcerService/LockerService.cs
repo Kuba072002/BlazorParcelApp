@@ -28,6 +28,19 @@ namespace BlazorParcelApp.Server.Services.LokcerService {
             return responce;
         }
 
+        public async Task<ServiceResponse<LockerDto>> DeleteLocker(int lockerId)
+        {
+            var locker = await _context.Lockers.FirstOrDefaultAsync(x => x.Id == lockerId);
+            if (locker != null)
+            {
+                
+                _context.Remove(locker);
+                await _context.SaveChangesAsync();
+                return new ServiceResponse<LockerDto> { Success = true, Message = "Success" };
+            }
+            return new ServiceResponse<LockerDto> { Success = false, Message = "Locker not exist" };
+        }
+
         public async Task<ServiceResponse<LockerDto>> GetLocker(int Id) {
             var locker = await _context.Lockers.FirstOrDefaultAsync(x => x.Id == Id);
             var responce = new ServiceResponse<LockerDto>();
@@ -67,6 +80,20 @@ namespace BlazorParcelApp.Server.Services.LokcerService {
             response.Data = responceList;
 
             return response;
+        }
+
+        public async Task<ServiceResponse<LockerDto>> UpdateLocker(LockerDto lockerDto)
+        {
+            var locker = await _context.Lockers.FirstOrDefaultAsync(l => lockerDto.Id == l.Id);
+            if(locker != null)
+            {
+                locker.Name = lockerDto.Name;
+                locker.City = lockerDto.City;
+                locker.Address = lockerDto.Address;
+                await _context.SaveChangesAsync();
+                return new ServiceResponse<LockerDto> { Success = true, Message = "Success" };
+            }
+            return new ServiceResponse<LockerDto> { Success = false, Message="Locker not exist" };
         }
 
         private async Task<string> CreateName(string CityName)

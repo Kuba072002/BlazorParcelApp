@@ -1,0 +1,144 @@
+﻿@page "/admin/lockers"
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "Admin")]
+<h3>Lockers</h3>
+
+<button type="button" class="btn btn-primary mb-3" @onclick="ShowAddLocker">Add locker</button>
+
+<RadzenDataGrid PageSize="5" AllowColumnResize="true"
+    AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true"
+    AllowPaging="true" AllowSorting="true"
+    AllowFiltering="true" FilterMode="FilterMode.Advanced"
+    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    LogicalFilterOperator="LogicalFilterOperator.Or"
+    FilterPopupRenderMode="PopupRenderMode.OnDemand"
+    Data="@lockers" TItem="LockerDto">
+    <Columns>
+        <RadzenDataGridColumn TItem="LockerDto" Property="Name" Title="Name" />
+        <RadzenDataGridColumn TItem="LockerDto" Property="City" Title="City" />
+        <RadzenDataGridColumn TItem="LockerDto" Property="Address" Title="Address" />
+
+        <RadzenDataGridColumn TItem="LockerDto" Title="Actions"
+            Filterable="false" Sortable="false">
+            <Template Context="locker">
+                <RadzenButton Click="@(() => EditLocker(locker))" Icon="edit" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" />
+                <RadzenButton Click="@(() => DeleteLocker(locker))" Icon="delete" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@if (showForm)
+{
+    <EditForm Model="lockerDto" OnSubmit="AddOrEditLocker" class="d-flex flex-column align-items-center mt-3">
+        <div class="border p-4 col-sm-8 col-lg-6">
+            
+            @if (isAdding == false)
+            {
+                <h3 class="text-center">Edit locker</h3>
+                <div class="mb-2">
+                <label for="name">Name:</label>
+                <InputText @bind-Value="lockerDto.Name" class="form-control"></InputText>
+                </div>
+            }else {
+                <h3 class="text-center">Add locker</h3>
+            }
+            <div class="mb-2">
+                <label for="city">City:</label>
+                <InputText @bind-Value="lockerDto.City" class="form-control"></InputText>
+            </div>
+            <div class="mb-2">
+                <label for="name">Address:</label>
+                <InputText @bind-Value="lockerDto.Address" class="form-control"></InputText>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3 w-100">Submit</button>
+            <div class="text-danger">
+                <span>@errorMessage</span>
+            </div>
+        </div>       
+    </EditForm>
+}
+@code {
+    List<LockerDto> lockers;
+    LockerDto lockerDto = new LockerDto();
+    bool isAdding = true;
+    bool showForm = false;
+
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        lockers = await Http.GetFromJsonAsync<List<LockerDto>>("/api/Locker");
+    }
+
+    private void EditLocker(LockerDto locker)
+    {
+        if (isAdding == false && showForm == true)
+        {
+            showForm = false;
+        }
+        else
+        {
+            isAdding = false;
+            lockerDto = locker;
+            showForm = true;
+        }
+    }
+
+    private async Task DeleteLocker(LockerDto locker)
+    {
+        if (await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this item?"))
+        {
+            await Http.DeleteAsync($"/api/Locker/{locker.Id}");
+            await RefreshGridAsync();
+        }
+    }
+
+    private async Task RefreshGridAsync()
+    {
+        lockers = await Http.GetFromJsonAsync<List<LockerDto>>("/api/Locker");
+    }
+    private async Task AddOrEditLocker()
+    {
+        if (isAdding)
+        {
+            var result = await Http.PostAsJsonAsync($"/api/Locker/", lockerDto);
+            if (!result.IsSuccessStatusCode)
+            {
+                errorMessage = await result.Content.ReadAsStringAsync();
+                return;
+            }
+        }
+        else
+        {
+            var result = await Http.PutAsJsonAsync($"/api/Locker/", lockerDto);
+            if (!result.IsSuccessStatusCode)
+            {
+                errorMessage = await result.Content.ReadAsStringAsync();
+                return;
+            }
+        }
+        showForm = false;
+        await RefreshGridAsync();
+    }
+
+    private void ShowAddLocker()
+    {
+        if (isAdding && showForm == false)
+        {
+            lockerDto = new();
+            showForm = true;
+        }
+        else if (isAdding)
+        {
+            showForm = false;
+        }
+        else
+        {
+            isAdding = true;
+            lockerDto = new();
+            showForm = true;
+        }
+    }
+}
