@@ -5,5 +5,6 @@
         Task<ServiceResponse<ParcelDto>> AddParcel(ParcelDto parcelDto);
         Task<ServiceResponse<ParcelDto>> UpdateParcelState(int parcelId);
         Task<ServiceResponse<string>> DeleteParcel(int Id);
+        Task<ServiceResponse<List<ParcelDto>>> GetParcelsByUser(string username);
     }
 }

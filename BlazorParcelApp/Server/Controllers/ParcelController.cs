@@ -22,6 +22,18 @@ namespace BlazorParcelApp.Server.Controllers {
             return Ok(result);
         }
 
+        [HttpGet("GetParcelsByUser/{username}")]
+        public async Task<ActionResult<List<ParcelDto>>> GetParcelsByUser(string username)
+        {
+            var response = await _parcelService.GetParcelsByUser(username);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            var result = response.Data.ToArray();
+            return Ok(result);
+        }
+
         [HttpGet("{Id}")]
         public async Task<ActionResult<ParcelDto>> GetParcel(int Id) {
             var response = await _parcelService.GetParcel(Id);
