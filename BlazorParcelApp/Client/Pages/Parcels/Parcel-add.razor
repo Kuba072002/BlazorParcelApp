@@ -1,65 +1,89 @@
-﻿@page "/parcels/add"
+﻿@page "/parcel-add"
+@using BlazorParcelApp.Client.Services;
+@using System.Text.Json;
+@using Radzen;
 @inject HttpClient Http
 @inject NavigationManager NavManager
 @attribute [Authorize]
-<h3>Parcel_add</h3>
+@inject IAuthService AuthService
+@inject ILockerService lockerService
 
-<div class="container-fluid">
-    <div class="row px-3">
-        <div class="col-md-9 p-3">
-            <EditForm Model="parcelDto" OnSubmit="OnSubmit">
-            <div class="row">
-                <div class="col">
-                    <div>Name:</div>
-                    <InputText @bind-Value="parcelDto.Name" class="form-control"></InputText>
-                </div>
-                <div class="col">
-                    <div>From:</div>
-                    <InputText @bind-Value="parcelDto.SrcLocker" class="form-control"></InputText>
-                </div>
-                <div class="col">
-                    <div>To:</div>
-                    <InputText @bind-Value="parcelDto.DestLocker" class="form-control"></InputText>
-                </div>
-                <div class="col">
-                    <div>Receiver:</div>
-                    <InputText @bind-Value="parcelDto.Receiver" class="form-control"></InputText>
-                </div>
-                <br />
-                <br />
-                <div >
-                    <button type="submit" class="btn btn-primary">
-                        Add
-                        <!---<i class="oi oi-cloud-upload"></i>--->
-                    </button>
-                    <div class="text-danger">
-                    <span>@errorMessage</span>
-                    </div>
-                </div>
-            </div>
-            </EditForm>
+@if (lockers == null || usernames == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+<EditForm Model="parcelDto" OnSubmit="OnSubmit" class="d-flex flex-column align-items-center">
+    <div class="border p-4 col-6 gap-2 d-flex flex-column">
+    <h3 class="text-center">Parcel add</h3>
+    
+    <label>From:</label>
+    <RadzenDropDown TValue="string" @bind-Value="CityFrom" Placeholder="Select city"
+        AllowFiltering="true" Data="@(lockers)" TextProperty="City" ValueProperty="City"
+        Style="width: 100%;" 
+    />
+    
+    <RadzenDropDown TValue="string" @bind-Value="parcelDto.SrcLocker" Placeholder="Select address"
+        AllowFiltering="true" Data="@(lockers.Where(l=> l.City.Equals(CityFrom)).ToList())" 
+        TextProperty="Address" ValueProperty="Name" Style="width: 100%;"
+    />
+        
+    <label>To:</label>
+    <RadzenDropDown TValue="string" @bind-Value="CityTo" Placeholder="Select city"
+        AllowFiltering="true" Data="@(lockers)" TextProperty="City" ValueProperty="City"
+        Style="width: 100%;"
+    />
+
+    <RadzenDropDown TValue="string" @bind-Value="parcelDto.DestLocker" Placeholder="Select address"
+        AllowFiltering="true" Data="@(lockers.Where(l=> l.City.Equals(CityTo)).ToList())" 
+        TextProperty="Address" ValueProperty="Name" Style="width: 100%;" 
+    />
+    <label>Receiver:</label>
+    <RadzenAutoComplete @bind-Value=@parcelDto.Receiver Data=@usernames 
+        Style="width: 100%" />
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary w-100">Add</button>
+        <div class="text-danger">
+            <span>@errorMessage</span>
         </div>
     </div>
-</div>
+    </div>
+</EditForm>
+}
+
 @code {
     ParcelDto parcelDto = new ParcelDto();
     private string errorMessage = string.Empty;
-    List<string> usernames = new List<string>();
+    string myUsername = string.Empty;
+    List<LockerDto> lockers;
+    List<string> usernames;
 
-    protected override async void OnInitialized() {
-        var username = await Http.GetStringAsync($"api/User/GetMyName");
-        //usernames = await Http.GetFromJsonAsync<List<string>>("api/User/GetUsernames");
-        //ToReceive = result;
-        //Se = result;
-        //Sended = result.Where(p => p.Sender.Equals(username)).ToList<ParcelDto>();
-        //ToReceive = result.Where(p => p.Receiver.Equals(username)).ToList<ParcelDto>();
+    string CityFrom = string.Empty;
+    string CityTo = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        lockers = await Http.GetFromJsonAsync<List<LockerDto>>($"/api/Locker");
+        usernames = await Http.GetFromJsonAsync<List<string>>($"api/User/GetUsernames");
+        myUsername = await AuthService.GetUsername();
     }
 
-
     private async Task OnSubmit() {
-        var username = await Http.GetStringAsync($"/api/User/GetMyName");//GetFromJsonAsync<string>($"/api/User/GetMyName");
-        parcelDto.Sender = username;
+        if (myUsername.Equals(string.Empty))
+        {
+               errorMessage = "Problem";
+               return;
+        }
+        if (parcelDto.Receiver.Equals("") || parcelDto.SrcLocker.Equals("") || parcelDto.DestLocker.Equals(""))
+        {
+            errorMessage = "Problem";
+            return;
+        }
+        parcelDto.Sender = myUsername;
+        
         parcelDto.State = "posted";
+
         var result = await Http.PostAsJsonAsync($"/api/Parcel/", parcelDto);
 
         if (!result.IsSuccessStatusCode) {
@@ -68,7 +92,5 @@
         }
 
         NavManager.NavigateTo($"/parcels");
-
-
     }
 }

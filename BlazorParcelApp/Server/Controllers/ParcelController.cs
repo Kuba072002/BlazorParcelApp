@@ -31,12 +31,12 @@ namespace BlazorParcelApp.Server.Controllers {
             return Ok(response.Data);
         }
         [HttpPost]
-        public async Task<ActionResult<ParcelDto>> AddParcel(ParcelDto parcelDto) {
+        public async Task<ActionResult<string>> AddParcel(ParcelDto parcelDto) {
             var response = await _parcelService.AddParcel(parcelDto);
             if (!response.Success) {
-                return BadRequest(response);
+                return BadRequest(response.Message);
             }
-            return Ok(response.Data);
+            return Ok(response.Message);
         }
         [HttpPut]
         public async Task<ActionResult<ParcelDto>> UpdateParcel(ParcelDto parcelDto) {

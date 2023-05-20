@@ -24,7 +24,7 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
             var lockerDest = await _context.Lockers.Where(u => u.Name == parcelDto.DestLocker).FirstOrDefaultAsync();
 
             var newShipment = new Parcel {
-                Name = parcelDto.Name,
+                Name = Guid.NewGuid().ToString("N").Substring(0, 8),
                 State = parcelDto.State,
                 Sender = user,
                 Receiver = receiver,
