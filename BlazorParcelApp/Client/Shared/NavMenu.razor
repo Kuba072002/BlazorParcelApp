@@ -1,78 +1,92 @@
-﻿
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">BlazorParcelApp</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿@using System.Security.Claims
+@using BlazorParcelApp.Client.Services;
+@implements IDisposable
+@inject AuthenticationStateProvider AuthStateProvider
+@inject AppState AppState
+@inject IAuthService AuthService
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <!----
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-        ---->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/parcel-add">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Add parcel
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <AuthorizeView Roles="User">
+
+<nav class="navbar navbar-expand-lg bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand text-light" href="">BlazorParcelApp</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <span class="oi oi-home" aria-hidden="true"></span> Home
+          </NavLink>
+        </li>
+        @if (AppState.Role == "User")
+        {
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/parcel-add">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Add parcel
+                </NavLink>
+            </li>
+            <li class="nav-item">
                 <NavLink class="nav-link" href="/parcels">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Parcels
                 </NavLink>
-            </AuthorizeView>
-            <AuthorizeView Roles="Admin">
-                <NavLink class="nav-link" href="/admin/parcels">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Parcels
-            </NavLink>
-            </AuthorizeView>
-        </div>
-        <!----
-            <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/admin/locker-add">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Add locker
-            </NavLink>
-        </div>
-        --->
-        <div class="nav-item px-3">
-            <AuthorizeView Roles="User">
+            </li>
+            <li class="nav-item">
                 <NavLink class="nav-link" href="/lockers">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Lockers
                 </NavLink>
-            </AuthorizeView>
-            <AuthorizeView Roles="Admin">
-                <NavLink class="nav-link" href="/admin/lockers">
-                    <span class="oi oi-list-rich" aria-hidden="true"></span> Lockers
+            </li>
+        }
+        else if(AppState.Role == "Admin")
+        {
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/admin/parcels">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Parcels
                 </NavLink>
-            </AuthorizeView>
-        </div>
-    </nav>
-</div>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/admin/lockers">
+                     <span class="oi oi-list-rich" aria-hidden="true"></span> Lockers
+                </NavLink>
+            </li>
+        }
+      </ul>
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+      <AuthorizeView>
+        <NotAuthorized>
+        <li class="nav-item">
+          <NavLink class="nav-link" href="account/register">
+            <span class="oi oi-person" aria-hidden="true"></span> Register
+          </NavLink>
+        </li>
+        <li class="nav-item">
+          <NavLink class="nav-link" href="account/login">
+            <span class="oi oi-person" aria-hidden="true"></span> Login
+          </NavLink>
+        </li>
+        </NotAuthorized>
+        <Authorized>
+        <li class="nav-item">
+          <NavLink class="nav-link" href="account/logout">
+            <span class="oi oi-person" aria-hidden="true"></span> Logout
+          </NavLink>
+        </li>
+        </Authorized>
+      </AuthorizeView>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 @code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
+    protected override async Task OnInitializedAsync()
     {
-        collapseNavMenu = !collapseNavMenu;
+        AppState.OnChange += StateHasChanged;
+        await AppState.Set(await AuthService.GetAuthRole());
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
     }
 }

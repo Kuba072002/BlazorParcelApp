@@ -4,5 +4,6 @@
         Task<ServiceResponse<string>> Login(UserLoginDto request);
         Task<bool> IsUserAuthenticated();
         Task<string> GetUsername();
+        Task<string> GetAuthRole();
     }
 }

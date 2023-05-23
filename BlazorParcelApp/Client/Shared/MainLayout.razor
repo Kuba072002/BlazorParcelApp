@@ -3,36 +3,13 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavManager
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-    
+<div class="page">    
     <main>
-        <div class="top-row px-4">
-            <AuthorizeView>
-                <Authorized>
-                    <a href="account/logout">Logout</a>
-                    <!----<a @onclick="Logout">Logout</a>--->
-                </Authorized>
-                <NotAuthorized>
-                    <a href="account/login">Login</a>
-                    <a href="account/register">Register</a>
-                </NotAuthorized>
-            </AuthorizeView>
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
+        <NavMenu />
         <article class="content px-4">
+            
             @Body
+            <RadzenNotification></RadzenNotification>
         </article>
     </main>
 </div>
-
-@code{
-    private async Task Logout() {
-        await LocalStorage.RemoveItemAsync("authToken");
-        await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        NavManager.NavigateTo("/");
-    }
-}

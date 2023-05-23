@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Security.Claims;
 
 namespace BlazorParcelApp.Client.Services {
     public class AuthService : IAuthService {
@@ -26,6 +27,26 @@ namespace BlazorParcelApp.Client.Services {
         public async Task<ServiceResponse<int>> Register(UserRegisterDto request) {
             var result = await _http.PostAsJsonAsync("api/auth/register", request);
             return await result.Content.ReadFromJsonAsync<ServiceResponse<int>>();
+        }
+
+        public async Task<string> GetAuthRole()
+        {
+            await Task.Delay(500);
+            var authenticationState = await _authStateProvider.GetAuthenticationStateAsync();
+            if (authenticationState.User.Identity.IsAuthenticated)
+            {
+                string role = authenticationState.User.Claims
+                    .FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                if (role.Contains("User"))
+                {
+                   return "User";
+                }
+                else if (role.Contains("Admin"))
+                {
+                    return "Admin";
+                }
+            }
+            return string.Empty;
         }
     }
 }

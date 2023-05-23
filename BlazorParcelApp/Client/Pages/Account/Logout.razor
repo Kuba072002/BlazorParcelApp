@@ -1,12 +1,17 @@
 ﻿@page "/account/logout"
+@using BlazorParcelApp.Client.Services;
 @inject ILocalStorageService LocalStorage
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavManager
+@inject IAuthService AuthService
+@inject AppState AppState
 
 @code {
-    protected override async void OnInitialized() {
+    protected override async Task OnInitializedAsync()
+    {
         await LocalStorage.RemoveItemAsync("authToken");
         await AuthenticationStateProvider.GetAuthenticationStateAsync();
         NavManager.NavigateTo("/");
+        await AppState.Set(await AuthService.GetAuthRole());
     }
 }

@@ -1,5 +1,6 @@
 ﻿@page "/lockers"
 @inject HttpClient Http
+@attribute [Authorize(Roles = "User")]
 
 <RadzenDataGrid PageSize="5" AllowColumnResize="true" 
     AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 

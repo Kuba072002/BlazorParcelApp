@@ -1,10 +1,9 @@
 ﻿@page "/account/register"
 @using BlazorParcelApp.Client.Services;
 @inject IAuthService AuthService
+@inject NotificationService NotificationService
 
 <PageTitle>Register</PageTitle>
-
-
 
 <EditForm Model="user" OnValidSubmit="HandleRegistration" class="d-flex flex-column align-items-center">
 <div class="border p-4 col-6">
@@ -50,8 +49,17 @@
     async Task HandleRegistration() {
         var result = await AuthService.Register(user);
         message = result.Message;
-        if (result.Success)
+        if (result.Success){
             messageCssClass = "text-success";
+            NotificationService.Notify(
+                new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Success, 
+                    Summary = "Registration successfull", 
+                    Duration = 4000 
+                }
+            );
+        }
         else
             messageCssClass = "text-danger";
     }

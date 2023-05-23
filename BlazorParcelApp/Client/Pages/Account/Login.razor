@@ -5,9 +5,10 @@
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NotificationService NotificationService
+@inject AppState AppState
 
 <PageTitle>Login</PageTitle>
-
 
 <EditForm Model="user" OnValidSubmit="HandleLogin" class="d-flex flex-column align-items-center">
 <div class="border p-4 col-6">
@@ -55,6 +56,15 @@
             await LocalStorage.SetItemAsync("authToken", result.Data);
             await AuthenticationStateProvider.GetAuthenticationStateAsync();
             NavigationManager.NavigateTo(returnUrl);
+            NotificationService.Notify(
+                new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Login successfull",
+                        Duration = 4000
+                    }
+            );
+            await AppState.Set(await AuthService.GetAuthRole());
         }
         else {
             errorMessage = result.Message;
