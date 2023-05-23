@@ -24,8 +24,8 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
             var user = _context.Users.Where(u => u.Username.Equals(_userService.GetUserName())).FirstOrDefault();
             //var sender = await _context.Users.FindAsync();
             var receiver = await _context.Users.Where(u => u.Username == parcelDto.Receiver).FirstOrDefaultAsync();
-            var lockerSrc = await _context.Lockers.Where(u => u.Name == parcelDto.SrcLocker).FirstOrDefaultAsync();
-            var lockerDest = await _context.Lockers.Where(u => u.Name == parcelDto.DestLocker).FirstOrDefaultAsync();
+            var lockerSrc = await _context.Lockers.Where(u => u.Id == parcelDto.SrcLocker.Id).FirstOrDefaultAsync();
+            var lockerDest = await _context.Lockers.Where(u => u.Id == parcelDto.DestLocker.Id).FirstOrDefaultAsync();
 
             var newShipment = new Parcel
             {
@@ -70,8 +70,20 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
                 CurrentState = parcel.CurrentState,
                 Sender = parcel.Sender.Username,
                 Receiver = parcel.Receiver.Username,
-                SrcLocker = parcel.SrcLocker.Name,
-                DestLocker = parcel.DestLocker.Name
+                DestLocker = new LockerDto
+                {
+                    Id = parcel.DestLocker.Id,
+                    Name = parcel.DestLocker.Name,
+                    City = parcel.DestLocker.City,
+                    Address = parcel.DestLocker.Address
+                },
+                SrcLocker = new LockerDto
+                {
+                    Id = parcel.SrcLocker.Id,
+                    Name = parcel.SrcLocker.Name,
+                    City = parcel.SrcLocker.City,
+                    Address = parcel.SrcLocker.Address
+                }
             };
             response.Message = "Parcel successfully get";
             response.Data = sd;
@@ -106,8 +118,20 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
                     CurrentState = p.CurrentState,
                     Sender = p.Sender.Username,
                     Receiver = p.Receiver.Username,
-                    DestLocker = p.DestLocker.Name,
-                    SrcLocker = p.SrcLocker.Name
+                    DestLocker = new LockerDto
+                    {
+                        Id = p.DestLocker.Id,
+                        Name = p.DestLocker.Name,
+                        City = p.DestLocker.City,
+                        Address = p.DestLocker.Address
+                    },
+                    SrcLocker = new LockerDto
+                    {
+                        Id = p.SrcLocker.Id,
+                        Name = p.SrcLocker.Name,
+                        City = p.SrcLocker.City,
+                        Address = p.SrcLocker.Address
+                    }
                 };
                 parcelsDtoList.Add(pdto);
             }
@@ -151,8 +175,20 @@ namespace BlazorParcelApp.Server.Services.ParcelService {
                     CurrentState = p.CurrentState,
                     Sender = p.Sender.Username,
                     Receiver = p.Receiver.Username,
-                    DestLocker = p.DestLocker.Name,
-                    SrcLocker = p.SrcLocker.Name
+                    DestLocker = new LockerDto 
+                    { 
+                        Id = p.DestLocker.Id,
+                        Name = p.DestLocker.Name,
+                        City= p.DestLocker.City,
+                        Address = p.DestLocker.Address
+                    },
+                    SrcLocker = new LockerDto
+                    {
+                        Id = p.SrcLocker.Id,
+                        Name = p.SrcLocker.Name,
+                        City = p.SrcLocker.City,
+                        Address = p.SrcLocker.Address
+                    }
                 }).ToListAsync();
             return response;
         }

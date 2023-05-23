@@ -5,7 +5,7 @@
 @inject IAuthService AuthService
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
-@attribute [Authorize]
+@attribute [Authorize(Roles ="User")]
 <div class="d-flex flex-row justify-content-between m-3">
 <h3>Parcels</h3>
 <RadzenButton Click="@GoToAddParcelPage" Text="Add parcel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" />
@@ -22,15 +22,69 @@
         <RadzenDataGridColumn TItem="ParcelDto" Property="Name" Title="Name" />
         <RadzenDataGridColumn TItem="ParcelDto" Property="CurrentState" Title="State" />
         <RadzenDataGridColumn TItem="ParcelDto" Property="Sender" Title="Sender" />
-        <RadzenDataGridColumn TItem="ParcelDto" Property="SrcLocker" Title="SrcLocker" />
+        <RadzenDataGridColumn TItem="ParcelDto" Property="SrcLocker.Name" Title="SrcLocker" />
         <RadzenDataGridColumn TItem="ParcelDto" Property="Receiver" Title="Receiver" />
-        <RadzenDataGridColumn TItem="ParcelDto" Property="DestLocker" Title="DestLocker" />
+        <RadzenDataGridColumn TItem="ParcelDto" Property="DestLocker.Name" Title="DestLocker" />
+
+        <RadzenDataGridColumn TItem="ParcelDto" TextAlign="TextAlign.Left"
+            Filterable="false" Sortable="false" Width="90px">
+            <Template Context="parcel">
+                <RadzenButton Click="@(() => ShowDetails(parcel))" Text="Details" Size="ButtonSize.ExtraSmall" ButtonStyle="ButtonStyle.Secondary" />
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
+
+@if (showDetails)
+{
+<div class="d-flex flex-column align-items-center mt-3">
+    <div class="border p-4 col-lg-6">
+        <label>Name</label>
+        <p><b>@parcelDto.Name</b></p>
+        <label>State</label>
+        <div class="d-flex flex-row justify-content-between">
+        <p><b>@parcelDto.CurrentState.ToString()</b></p>
+        </div>
+        <table class="table table-bordered mt-3">
+            <thead class="text-center">
+                <tr>
+                <th scope="col">Sender</th>
+                <th scope="col">Receiver</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                <tr>
+                <td>@parcelDto.Sender</td>
+                <td>@parcelDto.Receiver</td>
+                </tr>  
+            </tbody>
+        </table>
+        <h5 class="text-center">Source</h5>
+        <div class="d-flex justify-content-center">
+            <ul class="list-group list-group-horizontal">
+                <li class="list-group-item">@parcelDto.SrcLocker.Name</li>
+                <li class="list-group-item">@parcelDto.SrcLocker.City</li>
+                <li class="list-group-item">@parcelDto.SrcLocker.Address</li>
+            </ul>
+        </div>
+        <h5 class="text-center mt-3">Destination</h5>
+        <div class="d-flex justify-content-center">       
+        <ul class="list-group list-group-horizontal">
+            <li class="list-group-item">@parcelDto.DestLocker.Name</li>
+            <li class="list-group-item">@parcelDto.DestLocker.City</li>
+            <li class="list-group-item">@parcelDto.DestLocker.Address</li>
+        </ul>
+        </div>
+    </div>
+</div>
+}
 
 @code {
     List<ParcelDto> parcels = new();
     string username = string.Empty;
+    ParcelDto parcelDto = new ParcelDto();
+
+    bool showDetails = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,5 +95,11 @@
     void GoToAddParcelPage()
     {
         NavigationManager.NavigateTo("/parcel-add");
+    }
+
+    private void ShowDetails(ParcelDto parcel)
+    {
+        parcelDto = parcel;
+        showDetails = (showDetails == true) ? false : true;
     }
 }

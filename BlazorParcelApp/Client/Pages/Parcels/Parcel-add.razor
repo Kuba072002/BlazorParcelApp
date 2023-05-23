@@ -4,7 +4,7 @@
 @using Radzen;
 @inject HttpClient Http
 @inject NavigationManager NavManager
-@attribute [Authorize]
+@attribute [Authorize(Roles = "User,Admin")]
 @inject IAuthService AuthService
 @inject ILockerService lockerService
 
@@ -20,25 +20,24 @@ else
     
     <label>From:</label>
     <RadzenDropDown TValue="string" @bind-Value="CityFrom" Placeholder="Select city"
-        AllowFiltering="true" Data="@(lockers)" TextProperty="City" ValueProperty="City"
-        Style="width: 100%;" 
+        AllowFiltering="true" Data="@(cities)" Style="width: 100%;" 
     />
     
-    <RadzenDropDown TValue="string" @bind-Value="parcelDto.SrcLocker" Placeholder="Select address"
-        AllowFiltering="true" Data="@(lockers.Where(l=> l.City.Equals(CityFrom)).ToList())" 
-        TextProperty="Address" ValueProperty="Name" Style="width: 100%;"
+        <RadzenDropDown TValue="int" @bind-Value="parcelDto.SrcLocker.Id" Placeholder="Select address"
+        AllowFiltering="true" Data="@(lockers.Where(l=> l.City.Equals(CityFrom)).OrderBy(l=> l.Address).ToList())" 
+        TextProperty="Address" ValueProperty="Id" Style="width: 100%;"
     />
-        
+    
     <label>To:</label>
     <RadzenDropDown TValue="string" @bind-Value="CityTo" Placeholder="Select city"
-        AllowFiltering="true" Data="@(lockers)" TextProperty="City" ValueProperty="City"
-        Style="width: 100%;"
+        AllowFiltering="true" Data="@(cities)" Style="width: 100%;"
     />
-
-    <RadzenDropDown TValue="string" @bind-Value="parcelDto.DestLocker" Placeholder="Select address"
-        AllowFiltering="true" Data="@(lockers.Where(l=> l.City.Equals(CityTo)).ToList())" 
-        TextProperty="Address" ValueProperty="Name" Style="width: 100%;" 
+    
+    <RadzenDropDown TValue="int" @bind-Value="parcelDto.DestLocker.Id" Placeholder="Select address"
+        AllowFiltering="true" Data="@(lockers.Where(l=> l.City.Equals(CityTo)).OrderBy(l=> l.Address).ToList())" 
+        TextProperty="Address" ValueProperty="Id" Style="width: 100%;" 
     />
+    
     <label>Receiver:</label>
     <RadzenAutoComplete @bind-Value=@parcelDto.Receiver Data=@usernames 
         Style="width: 100%" />
@@ -53,20 +52,24 @@ else
 }
 
 @code {
-    ParcelDto parcelDto = new ParcelDto();
+    ParcelDto parcelDto;
     private string errorMessage = string.Empty;
     string myUsername = string.Empty;
     List<LockerDto> lockers;
     List<string> usernames;
+    List<string> cities;
 
     string CityFrom = string.Empty;
     string CityTo = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        parcelDto = new ParcelDto();
         lockers = await Http.GetFromJsonAsync<List<LockerDto>>($"/api/Locker");
         usernames = await Http.GetFromJsonAsync<List<string>>($"api/User/GetUsernames");
         myUsername = await AuthService.GetUsername();
+        cities = lockers.Select(l => l.City).Order()
+            .Distinct().ToList();
     }
 
     private async Task OnSubmit() {
@@ -75,7 +78,7 @@ else
                errorMessage = "Problem";
                return;
         }
-        if (parcelDto.Receiver.Equals("") || parcelDto.SrcLocker.Equals("") || parcelDto.DestLocker.Equals(""))
+        if (parcelDto.Receiver.Equals("") || parcelDto.SrcLocker.Id == 0 || parcelDto.DestLocker.Id == 0)
         {
             errorMessage = "Problem";
             return;

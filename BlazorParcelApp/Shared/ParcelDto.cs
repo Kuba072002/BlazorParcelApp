@@ -5,7 +5,13 @@
         public State? CurrentState { get; set; }
         public string Sender { get; set; } = string.Empty;
         public string Receiver { get; set; } = string.Empty;
-        public string DestLocker { get; set; } = string.Empty;
-        public string SrcLocker { get; set; } = string.Empty;
+        public LockerDto DestLocker { get; set; }
+        public LockerDto SrcLocker { get; set; }
+
+        public ParcelDto()
+        {
+            DestLocker = new LockerDto();
+            SrcLocker = new LockerDto();
+        }
     }
 }
