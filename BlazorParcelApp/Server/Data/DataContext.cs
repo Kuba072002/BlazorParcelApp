@@ -7,7 +7,7 @@ namespace BlazorParcelApp.Server.Data {
         public DbSet<Parcel> Parcels { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Locker> Lockers { get; set; }
-
+        public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.Entity<Parcel>()
                 .HasOne(x => x.Sender)

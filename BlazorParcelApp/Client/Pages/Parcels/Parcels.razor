@@ -59,7 +59,7 @@
                 </tr>  
             </tbody>
         </table>
-        <h5 class="text-center">Source</h5>
+        <h5 class="text-center mt-3">Source</h5>
         <div class="d-flex justify-content-center">
             <ul class="list-group list-group-horizontal">
                 <li class="list-group-item">@parcelDto.SrcLocker.Name</li>
@@ -73,6 +73,14 @@
             <li class="list-group-item">@parcelDto.DestLocker.Name</li>
             <li class="list-group-item">@parcelDto.DestLocker.City</li>
             <li class="list-group-item">@parcelDto.DestLocker.Address</li>
+        </ul>
+        </div>
+        <h5 class="text-center mt-3">Notifications</h5>
+        <div class="d-flex justify-content-center">       
+        <ul class="list-group">
+            @foreach(NotificationDto ndto in parcelDto.NotificationDtos){
+                <li class="list-group-item">@ndto.Message  at  @ndto.CreatedAt.ToString()</li>
+            }
         </ul>
         </div>
     </div>

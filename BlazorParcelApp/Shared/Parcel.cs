@@ -15,5 +15,6 @@
         
         public int? SrcId { get; set; }
         public Locker SrcLocker { get; set; }
+        public List<Notification> Notifications { get; set; }
     }
 }

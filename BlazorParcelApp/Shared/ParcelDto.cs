@@ -7,11 +7,13 @@
         public string Receiver { get; set; } = string.Empty;
         public LockerDto DestLocker { get; set; }
         public LockerDto SrcLocker { get; set; }
+        public NotificationDto[] NotificationDtos { get; set; } 
 
         public ParcelDto()
         {
             DestLocker = new LockerDto();
             SrcLocker = new LockerDto();
+            NotificationDtos = new NotificationDto[0];
         }
     }
 }
